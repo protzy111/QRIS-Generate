@@ -1,0 +1,6 @@
+<?php
+require_once __DIR__.'/../config/auth.php';
+if(admin()){header('Location:/admin/dashboard.php');exit;}
+$error='';
+if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$s=$pdo->prepare('SELECT * FROM admins WHERE username=?');$s->execute([trim($_POST['username']??'')]);$a=$s->fetch();if($a&&password_verify($_POST['password']??'',$a['password_hash'])){session_regenerate_id(true);$_SESSION['admin_id']=(int)$a['id'];header('Location:/admin/dashboard.php');exit;}$error='Login admin gagal.';}
+?><!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:Arial;background:#eee;display:grid;place-items:center;min-height:100vh}.c{background:#fff;padding:25px;width:min(400px,92vw);border-radius:12px}input,button{width:100%;padding:12px;margin:6px 0;box-sizing:border-box}button{background:#111;color:#fff;border:0;border-radius:7px}</style><div class="c"><h2>Admin Login</h2><?php if($error):?><p><?=e($error)?></p><?php endif;?><form method="post"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><input name="username" placeholder="Username" required><input name="password" type="password" placeholder="Password" required><button>Login</button></form></div>
